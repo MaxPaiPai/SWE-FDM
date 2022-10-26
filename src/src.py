@@ -1,3 +1,4 @@
+# 2d inviscous linearized SWE 
 import numpy as np
 import matplotlib.pyplot as plt
 from moviepy.editor import VideoClip
@@ -44,7 +45,7 @@ y_momentum = empty_grid.copy()
 height_list = [h_current]
 for time in range(t_final):
 
-    # print("Mass: ", (4*x_range*y_range*density*np.sum(h_current)/(len(h_current)*len(h_current)))/1E6)
+    print("Mass: ", (4*x_range*y_range*density*np.sum(h_current)/(len(h_current)*len(h_current)))/1E6)
 
     # discritize momentum equations
     u_next[:-1, :] = u_current[:-1, :] - g*delta_t/delta_x*(h_current[1:, :] - h_current[:-1, :])
@@ -56,19 +57,31 @@ for time in range(t_final):
     v_next[:, -1] = 0
 
 
-    # discritize continuity equation
-    x_momentum[0, :] = u_next[0, :]*(h_current + depth)[0, :]+u_current[0, :]*((h_current + depth)[0, :]-depth)
-    x_momentum[1:, :] = u_next[1:, :]*(h_current + depth)[1:, :] - u_next[:-1, :]*(h_current + depth)[:-1, :]
-    x_momentum[-1, :] += -u_current[-1, :]*((h_current + depth)[-1, :]-depth)
+    # discritize continuity equation (lienar continuity)
+    x_momentum[0, :] = u_next[0, :]+u_current[0, :]
+    x_momentum[1:, :] = u_next[1:, :] - u_next[:-1, :]
+    x_momentum[-1, :] += -u_current[-1, :]
     
     
-    y_momentum[:, 0] = v_next[:, 0]*(h_current + depth)[:, 0]+v_current[:, 0]*((h_current + depth)[:, 0]-depth)
-    y_momentum[:, 1:] = v_next[:, 1:]*(h_current + depth)[:, 1:] - v_next[:, :-1]*(h_current + depth)[:, :-1]
-    y_momentum[:, -1] += v_current[:, -1]*((h_current + depth)[:, -1]-depth)
+    y_momentum[:, 0] = v_next[:, 0]+v_current[:, 0]
+    y_momentum[:, 1:] = v_next[:, 1:] - v_next[:, :-1]
+    y_momentum[:, -1] += v_current[:, -1]
+
+    # discritize continuity equation (nonlinear continuity)
+    # x_momentum[0, :] = u_next[0, :]*(h_current + depth)[0, :]+u_current[0, :]*((h_current + depth)[0, :]-depth)
+    # x_momentum[1:, :] = u_next[1:, :]*(h_current + depth)[1:, :] - u_next[:-1, :]*(h_current + depth)[:-1, :]
+    # x_momentum[-1, :] += -u_current[-1, :]*((h_current + depth)[-1, :]-depth)
     
     
+    # y_momentum[:, 0] = v_next[:, 0]*(h_current + depth)[:, 0]+v_current[:, 0]*((h_current + depth)[:, 0]-depth)
+    # y_momentum[:, 1:] = v_next[:, 1:]*(h_current + depth)[:, 1:] - v_next[:, :-1]*(h_current + depth)[:, :-1]
+    # y_momentum[:, -1] += v_current[:, -1]*((h_current + depth)[:, -1]-depth)
+
+
     # forward in time
-    h_next = h_current - delta_t*(x_momentum/delta_x + y_momentum/delta_y)    
+    # h_next = h_current - delta_t*(x_momentum/delta_x + y_momentum/delta_y)    
+
+    h_next = h_current - delta_t*depth*(x_momentum/delta_x + y_momentum/delta_y)  
 
     height_list.append(h_next)
 

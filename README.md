@@ -1,1 +1,1 @@
-## Finite difference method for 2D shallow water equation (python implementation)
+## 2D Shallow Water Equations Solver using Finite difference method

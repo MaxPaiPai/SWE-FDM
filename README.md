@@ -1,4 +1,4 @@
-## 2-Dimensional Shallow Water Equations Solver using Finite Difference Method 
+## Two-Dimensional Shallow Water Equations Solver using Finite Difference Method 
 
 
 
